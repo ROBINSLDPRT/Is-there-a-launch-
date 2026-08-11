@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is There A Launch?</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0b0c10;
+            --surface: #111319;
+            --border: #23262f;
+            --text: #e6e7eb;
+            --dim: #8b8fa0;
+            --faint: #565a68;
+            --red: #c8272c;
+            --green: #3f8a5f;
+            /* --old-accent: #ffb000; garde au cas où on revient au thème amber */
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'IBM Plex Sans', Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .mono {
+            font-family: 'IBM Plex Mono', 'SF Mono', monospace;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 56px;
+
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+            margin: 0; /* déjà fait par le reset mais bon */
+        }
+
+        .menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .menu a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.15s;
+        }
+
+        .menu a:hover { color: var(--text); }
+
+        .hero {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 82vh;
+            object-fit: cover;
+            filter: saturate(0.75) contrast(1.05) brightness(0.9);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(11,12,16,0.75) 0%, rgba(11,12,16,0.15) 35%, rgba(11,12,16,0.05) 60%, rgba(11,12,16,0.55) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 40px 32px;
+        }
+
+        .hero-text {
+            max-width: 640px;
+        }
+
+        .hero .tag {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 12px;
+        }
+
+        .hero h1 {
+            font-weight: 700;
+            font-size: 2.1rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+
+        .hero p {
+            color: #c3c6d1;
+            font-size: 0.95rem;
+            max-width: 62ch;
+        }
+
+        .hero figcaption {
+            position: absolute;
+            bottom: 12px;
+            right: 14px;
+            font-size: 11px;
+            color: var(--dim);
+            background: rgba(11,12,16,0.7);
+            padding: 3px 8px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat {
+            padding: 18px 32px;
+            border-right: 1px solid var(--border);
+        }
+
+        .stat:last-child { border-right: none; }
+
+        .stat .label {
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--faint);
+            margin-bottom: 6px;
+        }
+
+        .stat .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 48px 32px 100px;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 24px;
+            margin-bottom: 22px;
+        }
+
+        .section-head h2 {
+            font-weight: 600;
+            font-size: 1.15rem;
+        }
+
+        .section-head span {
+            color: var(--faint);
+            font-size: 0.8rem;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            padding: 0 12px;
+            margin-bottom: 4px;
+        }
+
+        .search-icon {
+            color: var(--faint);
+            font-size: 0.85rem;
+        }
+
+        #search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: 'IBM Plex Sans', Arial, sans-serif;
+            font-size: 0.88rem;
+            padding: 12px 0;
+        }
+
+        #search-input::placeholder {
+            color: var(--faint);
+        }
+
+        .search-count {
+            color: var(--faint);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        table.manifest {
+            width: 100%;
+            border-collapse: collapse;
+            border-top: 1px solid var(--border);
+        }
+
+        tr.no-results td {
+            padding: 24px 12px;
+            color: var(--faint);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .load-more {
+            display: block;
+            width: 100%;
+            margin-top: 0;
+            padding: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: none;
+            color: var(--dim);
+            font-size: 0.8rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        .load-more:hover {
+            color: var(--text);
+            background: #171922;
+        }
+
+        .load-more:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        table.manifest thead th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--faint);
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table.manifest thead th:first-child { width: 3rem; }
+        table.manifest thead th:last-child { width: 1.5rem; }
+
+        tr.launch-row td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        tr.launch-row {
+            cursor: pointer;
+        }
+
+        tr.launch-row:hover td {
+            background: var(--surface);
+        }
+
+        tr.launch-row td.idx {
+            color: var(--faint);
+        }
+
+        tr.launch-row td.name {
+            font-weight: 500;
+        }
+
+        tr.launch-row td.when {
+            color: var(--dim);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10.5px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border: 1px solid var(--border);
+            color: var(--dim);
+        }
+
+        .badge.status-go { color: var(--green); border-color: var(--green); }
+        .badge.status-hold { color: var(--red); border-color: var(--red); }
+
+        tr.launch-row td.chevron {
+            color: var(--faint);
+            text-align: right;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        tr.launch-row.open td.chevron {
+            transform: rotate(90deg);
+            color: var(--text);
+        }
+
+        tr.detail-row { display: none; }
+        tr.detail-row.open { display: table-row; }
+
+        tr.detail-row td {
+            padding: 6px 12px 26px 46px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(150px, auto));
+            gap: 22px;
+            margin-bottom: 16px;
+        }
+
+        .detail-grid dt {
+            font-size: 10.5px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: var(--faint);
+            margin-bottom: 3px;
+        }
+
+        .detail-grid dd {
+            font-size: 0.88rem;
+        }
+
+        .brief {
+            font-size: 0.88rem;
+            color: #c8cad3;
+            max-width: 68ch;
+            line-height: 1.6;
+            border-left: 2px solid var(--border);
+            padding-left: 14px;
+        }
+
+        .brief .provider {
+            display: block;
+            margin-top: 8px;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--faint);
+        }
+
+        .loading, .error {
+            color: var(--dim);
+            padding: 20px 12px;
+            font-size: 0.88rem;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--faint);
+        }
+
+        @media (max-width: 760px) {
+            .stats-bar { grid-template-columns: 1fr; }
+            .stat { border-right: none; border-bottom: 1px solid var(--border); }
+            table.manifest thead { display: none; }
+            tr.launch-row td.idx, tr.launch-row td.when { display: none; }
+            tr.launch-row td.name { display: block; padding-bottom: 2px; }
+            tr.detail-row td { padding-left: 12px; }
+            .detail-grid { grid-template-columns: 1fr; gap: 10px; }
+            footer { flex-direction: column; gap: 6px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- nav bar -->
+    <nav>
+        <div class="logo">Is There A Launch?</div>
+        <div class="menu">
+            <a href="#">Home</a>
+            <a href="#launches">Launches</a>
+            <a href="#">About</a>
+        </div>
+    </nav>
+
+    <!-- hero image + titre, l'image vient de wikimedia en attendant d'en avoir une a nous -->
+    <figure class="hero">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Falcon%209%20and%20Dragon%20lift%20off%20from%20Launch%20Pad%2039A%20for%20CRS-10%20(32178458813).jpg" alt="Falcon 9 liftoff from Launch Pad 39A, Kennedy Space Center">
+        <div class="hero-overlay">
+            <div class="hero-text">
+                <div class="tag">Live launch manifest</div>
+                <h1>Is there a launch?</h1>
+                <p>Where, when, on what vehicle, and why — a continuously updated record of upcoming spaceflight activity worldwide, sourced from public launch-tracking data.</p>
+            </div>
+        </div>
+        <figcaption>Launch Pad 39A — Kennedy Space Center, NASA</figcaption>
+    </figure>
+
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat">
+            <div class="label">Tracked launches</div>
+            <div class="value mono" id="stat-count">—</div>
+        </div>
+        <div class="stat">
+            <div class="label">Next window</div>
+            <div class="value mono" id="stat-next">—</div>
+        </div>
+        <div class="stat">
+            <div class="label">Data source</div>
+            <div class="value">Launch Library 2</div>
+        </div>
+    </div>
+
+    <section class="content" id="launches">
+        <div class="section-head">
+            <h2>Upcoming launches</h2>
+            <span>Ordered by launch window — click a row for the mission brief</span>
+        </div>
+
+        <div class="search-bar">
+            <span class="search-icon mono">&#8250;_</span>
+            <input type="text" id="search-input" class="mono" placeholder="Search by mission, rocket, agency, or site…" autocomplete="off">
+            <span class="search-count mono" id="search-count"></span>
+        </div>
+
+        <!-- table du manifeste, cliquer sur une ligne deplie les details -->
+        <table class="manifest" tabindex="0">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Mission</th>
+                    <th>Window</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="launch-list">
+                <tr><td colspan="5" class="loading">Loading upcoming launches…</td></tr>
+            </tbody>
+        </table>
+
+        <button id="load-more" class="load-more mono" style="display:none;">Load more launches</button>
+    </section>
+
+    <footer>
+        <span>Is There A Launch? — Stardance Hackathon</span>
+        <span>Launch data via The Space Devs</span>
+    </footer>
+
+    <script>
+        const API_URL = 'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=30&mode=detailed';
+        let allLaunches = [];
+        let nextPageUrl = null;
+        var debugMode = false; // TODO: brancher un vrai toggle debug un jour
+
+        function formatDate(iso) {
+            const d = new Date(iso);
+            return d.toLocaleString('en-US', {
+                weekday: 'short', day: 'numeric', month: 'short',
+                year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function shortWhen(iso) {
+            if (!iso) return 'TBD';
+            const d = new Date(iso);
+            // format court pour la colonne "window", garder synchro avec formatDate() plus bas
+            return d.toLocaleString('en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str ?? '';
+            return div.innerHTML;
+        }
+
+        function countdownLabel(iso) {
+            if (!iso) return 'TBD';
+            const diffMs = new Date(iso) - new Date();
+            if (diffMs <= 0) return 'Imminent';
+            const days = Math.floor(diffMs / 86400000);
+            const hours = Math.floor((diffMs % 86400000) / 3600000);
+            if (days > 0) return `T-${days}d ${hours}h`;
+            const mins = Math.floor((diffMs % 3600000) / 60000);
+            return `T-${hours}h ${mins}m`;
+        }
+
+        // pas utilisée pour l'instant, gardée si jamais on veut trier autrement
+        function sortByDateAsc(launches) {
+            return launches.slice().sort((a, b) => new Date(a.net) - new Date(b.net));
+        }
+
+        function statusClass(status) {
+            const s = (status || '').toLowerCase();
+            if (s.includes('go') || s.includes('success')) return 'status-go';
+            if (s.includes('hold') || s.includes('fail') || s.includes('scrub')) return 'status-hold';
+            return '';
+        }
+
+        function launchSearchBlob(launch) {
+            const rocketName = launch.rocket?.configuration?.full_name || launch.rocket?.configuration?.name || '';
+            const location = launch.pad?.location?.name || launch.pad?.name || '';
+            const provider = launch.launch_service_provider?.name || '';
+            return [launch.name, rocketName, location, provider, launch.status?.name]
+                .join(' ')
+                .toLowerCase();
+        }
+
+        function renderRow(launch, i) {
+            const rocketName = launch.rocket?.configuration?.full_name
+                || launch.rocket?.configuration?.name
+                || 'Unknown vehicle';
+            const pad = launch.pad;
+            const location = pad?.name
+                ? `${pad.name}, ${pad.location?.name || ''}`
+                : (pad?.location?.name || 'Unknown location');
+            const provider = launch.launch_service_provider?.name || 'Unknown provider';
+            const missionDesc = launch.mission?.description
+                || 'No mission description available yet.';
+            const status = launch.status?.name || 'TBD';
+            const idx = String(i + 1).padStart(2, '0');
+            const blob = launchSearchBlob(launch);
+
+            return `
+                <tr class="launch-row" data-idx="${i}" data-search="${escapeHtml(blob)}" onclick="toggleRow(${i})">
+                    <td class="idx mono">${idx}</td>
+                    <td class="name">${escapeHtml(launch.name)}</td>
+                    <td class="when mono">${shortWhen(launch.net)}</td>
+                    <td><span class="badge ${statusClass(status)}">${escapeHtml(status)}</span></td>
+                    <td class="chevron">&#8250;</td>
+                </tr>
+                <tr class="detail-row" data-idx="${i}" data-search="${escapeHtml(blob)}">
+                    <td colspan="5">
+                        <div class="detail-grid">
+                            <div><dt>Date</dt><dd class="mono">${launch.net ? formatDate(launch.net) : 'TBD'}</dd></div>
+                            <div><dt>Site</dt><dd>${escapeHtml(location)}</dd></div>
+                            <div><dt>Vehicle</dt><dd>${escapeHtml(rocketName)}</dd></div>
+                        </div>
+                        <p class="brief">${escapeHtml(missionDesc)}<span class="provider">${escapeHtml(provider)}</span></p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function renderAll() {
+            const list = document.getElementById('launch-list');
+            list.innerHTML = allLaunches.map((launch, i) => renderRow(launch, i)).join('');
+            applySearch();
+        }
+
+        async function loadLaunches() {
+            const list = document.getElementById('launch-list');
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+
+                if (!data.results || data.results.length === 0) {
+                    list.innerHTML = '<tr><td colspan="5" class="loading">No upcoming launches found.</td></tr>';
+                    return;
+                }
+
+                allLaunches = data.results;
+                nextPageUrl = data.next;
+                console.log('launches loaded:', allLaunches.length); // a virer avant de rendre au client
+
+                document.getElementById('stat-count').textContent = data.count ?? allLaunches.length;
+                document.getElementById('stat-next').textContent = countdownLabel(allLaunches[0].net);
+
+                renderAll();
+                updateLoadMoreButton();
+
+            } catch (err) {
+                list.innerHTML = `<tr><td colspan="5" class="error">Could not load launches (${err.message}). Try again later.</td></tr>`;
+            }
+        }
+
+        async function loadMore() {
+            const btn = document.getElementById('load-more');
+            if (!nextPageUrl) return;
+            btn.disabled = true;
+            btn.textContent = 'Loading…';
+            try {
+                const res = await fetch(nextPageUrl);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                allLaunches = allLaunches.concat(data.results || []);
+                nextPageUrl = data.next;
+                renderAll();
+            } catch (err) {
+                btn.textContent = 'Failed to load — retry';
+            } finally {
+                btn.disabled = false;
+                updateLoadMoreButton();
+            }
+        }
+
+        function updateLoadMoreButton() {
+            const btn = document.getElementById('load-more');
+            if (nextPageUrl) {
+                btn.style.display = 'block';
+                btn.textContent = 'Load more launches';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function applySearch() {
+            const q = document.getElementById('search-input').value.trim().toLowerCase();
+            const rows = document.querySelectorAll('tr.launch-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const idx = row.getAttribute('data-idx');
+                const detail = document.querySelector(`tr.detail-row[data-idx="${idx}"]`);
+                const matches = !q || row.getAttribute('data-search').includes(q);
+
+                row.style.display = matches ? '' : 'none';
+                if (!matches) {
+                    row.classList.remove('open');
+                    detail.classList.remove('open');
+                    detail.style.display = 'none';
+                } else {
+                    detail.style.display = '';
+                    visibleCount++;
+                }
+            });
+
+            const countEl = document.getElementById('search-count');
+            countEl.textContent = q ? `${visibleCount} match${visibleCount !== 1 ? 'es' : ''}` : '';
+
+            const existingEmpty = document.getElementById('no-results-row');
+            if (existingEmpty) existingEmpty.remove();
+            if (q && visibleCount === 0) {
+                const tr = document.createElement('tr');
+                tr.className = 'no-results';
+                tr.id = 'no-results-row';
+                tr.innerHTML = '<td colspan="5">No launches match your search.</td>';
+                document.getElementById('launch-list').appendChild(tr);
+            }
+        }
+
+        function toggleRow(i) {
+            const row = document.querySelector(`tr.launch-row[data-idx="${i}"]`);
+            const detail = document.querySelector(`tr.detail-row[data-idx="${i}"]`);
+            const wasOpen = row.classList.contains('open');
+
+            document.querySelectorAll('tr.launch-row.open').forEach(r => r.classList.remove('open'));
+            document.querySelectorAll('tr.detail-row.open').forEach(r => r.classList.remove('open'));
+
+            if (!wasOpen) {
+                row.classList.add('open');
+                detail.classList.add('open');
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', applySearch);
+        document.getElementById('load-more').addEventListener('click', loadMore);
+
+        loadLaunches();
+    </script>
+
+</body>
+
+</html>
